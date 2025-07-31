@@ -2,8 +2,10 @@ import { View, Text, SafeAreaView, TextInput, TouchableOpacity } from 'react-nat
 import React from 'react'
 import { Dropdown } from 'react-native-element-dropdown'
 import { AntDesign } from '@expo/vector-icons'
+import { useRouter } from 'expo-router';
 
 export default function Page() {
+  const router = useRouter();
   const [empID, setEmpID] = React.useState('')
   const [droneID, setDroneID] = React.useState('')
   const [batteryID, setBatteryID] = React.useState('')
@@ -21,7 +23,7 @@ export default function Page() {
     { label: 'Item 7', value: '7' },
     { label: 'Item 8', value: '8' },
   ]
-
+  async function handleSubmit() {router.push('/(tabs)/forms/end_form/page');}
   return (
     <SafeAreaView className="flex-1 items-center justify-center bg-white">
       <View className="w-5/6 h-screen items-center justify-center gap-4">
@@ -76,7 +78,7 @@ export default function Page() {
           />
         </View>
 
-        <TouchableOpacity className="p-3 w-3/4 border rounded-full items-center">
+        <TouchableOpacity onPress={handleSubmit} className="p-3 w-3/4 border rounded-full items-center">
           <Text className="text-black">Submit</Text>
         </TouchableOpacity>
       </View>
