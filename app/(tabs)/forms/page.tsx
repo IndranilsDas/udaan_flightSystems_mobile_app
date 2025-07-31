@@ -76,8 +76,8 @@ export default function Page() {
           />
         </View>
 
-        <TouchableOpacity className="p-3 w-3/4 border rounded-full items-center bg-blue-500">
-          <Text className="text-white font-semibold">Submit</Text>
+        <TouchableOpacity className="p-3 w-3/4 border rounded-full items-center">
+          <Text className="text-black">Submit</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
