@@ -12,7 +12,7 @@ export default function page() {
   console.log("empID : ", empID, 'endVoltage : ', endVoltage, 'flightTime : ', flightTime, 'flightArea : ', flightArea, 'remarks : ', remarks);
 
   return (
-    <SafeAreaView className='flex flex-col h-full justify-center items-center'>
+    <SafeAreaView className='flex flex-col h-full justify-center items-center bg-white'>
       <View className='flex flex-col w-5/6 h-screen justify-center items-center gap-4'>
       <Text className='text-3xl font-semibold'>END FLIGHT</Text>
       <View className='flex flex-col justify-center h-3/5 w-full gap-3'>

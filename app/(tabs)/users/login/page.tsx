@@ -1,14 +1,18 @@
-import { Text, View, Image, SafeAreaView, TextInput, TouchableOpacity, Modal } from 'react-native'
-import React, { useState } from 'react'
+import { Text, View, Image, SafeAreaView, TextInput, TouchableOpacity, Modal } from 'react-native';
+import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
 
 export default function Page() {
-  const [empID, setEmpID] = useState('')
-  const [password, setPassword] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [empID, setEmpID] = useState('');
+  const [password, setPassword] = useState('');
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
 
-  async function handleLogin() {
+  console.log('empID:', empID);
+  console.log('password:', password);
+
+  async function handleDummyLogin() {
     if (password !== '' && empID !== '') {
       if (password === 'password' && empID === 'empid') {
         setSuccess(true);
@@ -20,10 +24,53 @@ export default function Page() {
     }
   }
 
+  async function handleLogin() {
+    if (empID === '' || password === '') return;
+
+    try {
+      // Build form-urlencoded body so PHP populates $_POST
+      const body = new URLSearchParams();
+      body.append('login-ID', empID);
+      body.append('login-pass', password);
+
+      const response = await axios.post(
+        'http://192.168.0.26/flightsystem/authchanges.php?action=login',
+        body.toString(),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Client': 'react-native',
+          },
+        }
+      );
+
+      console.log('Login response:', response.data);
+
+      // PHP returns { status: 'success', ... }
+      if (response.data.status === 'success') {
+        console.log('Login successful:', response.data);
+        setSuccess(true);
+        // store session_id if you return it:
+        // await AsyncStorage.setItem('PHPSESSID', response.data.session_id);
+        setTimeout(() => {
+          setSuccess(false);
+          router.push('/(tabs)/forms/start_form/page');
+        }, 2000);
+      } else {
+        console.log('Invalid credentials or login failed:', response.data);
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
+  }
+
   return (
-    <SafeAreaView className='flex flex-col h-full items-center justify-center'>
+    <SafeAreaView className='flex flex-col h-full items-center justify-center bg-white'>
       <View className='flex flex-col w-5/6 h-3/4 gap-4 items-center'>
-        <Image source={require('../../../../assets/images/PFEPL.png')} className='h-20 w-24' />
+        <Image
+          source={require('../../../../assets/images/PFEPL.png')}
+          className='h-20 w-24'
+        />
         <Text className='text-3xl text-black py-4 font-semibold'>Login</Text>
         <View className='flex flex-col h-1/2 w-full justify-center gap-3'>
           <Text className='text-[1.1rem]'>Employee ID :</Text>
@@ -42,14 +89,17 @@ export default function Page() {
             className='border placeholder:text-gray-400 placeholder:px-3 border-gray-300 rounded-xl'
           />
           <View className='flex items-center py-6'>
-            <TouchableOpacity className='p-3 w-3/4 border rounded-full items-center' onPress={handleLogin}>
+            <TouchableOpacity
+              className='p-3 w-3/4 border rounded-full items-center'
+              onPress={handleLogin}
+            >
               <Text>Submit</Text>
             </TouchableOpacity>
             {success && (
-              <Modal visible={success} transparent animationType="fade">
-                <View className="flex-1 justify-center items-center bg-black/50">
-                  <View className="bg-white px-6 py-4 rounded-xl shadow-md">
-                    <Text className="text-green-700 text-lg font-semibold">
+              <Modal visible={success} transparent animationType='fade'>
+                <View className='flex-1 justify-center items-center bg-black/50'>
+                  <View className='bg-white px-6 py-4 rounded-xl shadow-md'>
+                    <Text className='text-green-700 text-lg font-semibold'>
                       Login Successful!
                     </Text>
                   </View>
@@ -60,5 +110,5 @@ export default function Page() {
         </View>
       </View>
     </SafeAreaView>
-  )
+  );
 }
