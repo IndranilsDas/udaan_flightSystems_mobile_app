@@ -1,16 +1,30 @@
 import { Text, View, Image, SafeAreaView, TextInput, TouchableOpacity, Modal } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/libs/auth-context';
 
 export default function Page() {
   const [empID, setEmpID] = useState('');
   const [password, setPassword] = useState('');
   const [success, setSuccess] = useState(false);
+  const {user,logout} = useAuth()
   const router = useRouter();
 
   console.log('empID:', empID);
   console.log('password:', password);
+  
+  type UserData = {
+    empID: string;
+    empName: string;
+    role: number;
+    session_id?: string;
+  }
+
+  useEffect(()=>{
+    if(user){router.push('/(tabs)/forms/start_form/page')}
+  },[])
 
   async function handleDummyLogin() {
     if (password !== '' && empID !== '') {
@@ -50,11 +64,20 @@ export default function Page() {
       if (response.data.status === 'success') {
         console.log('Login successful:', response.data);
         setSuccess(true);
+        const userData: UserData = {
+          empID: response.data.emp_id,
+          empName: response.data.emp_name,
+          role: response.data.role,
+        };
         // store session_id if you return it:
         // await AsyncStorage.setItem('PHPSESSID', response.data.session_id);
+        const jsonValue = JSON.stringify(userData);
+        await AsyncStorage.setItem('userData', jsonValue);
+        const userDataFromStorage = await AsyncStorage.getItem('userData');
+        console.log('User data stored:', userDataFromStorage);
         setTimeout(() => {
           setSuccess(false);
-          router.push('/(tabs)/forms/start_form/page');
+          router.push('/(tabs)/home/page');
         }, 2000);
       } else {
         console.log('Invalid credentials or login failed:', response.data);
